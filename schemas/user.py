@@ -1,21 +1,23 @@
 from typing import Optional
 from datetime import datetime
-from sqlmodel import SQLModel, Field
-from pydantic import EmailStr
+from sqlmodel import SQLModel
+from pydantic import EmailStr, Field as PydanticField
 
 
 # Create schema
 class UserCreate(SQLModel):
     email: EmailStr
-    password: str = Field(min_length=8)
+    role: str = "user"
+    password: str = PydanticField(min_length=8)
 
 # Output schema (no password)
 class UserOut(SQLModel):
     id: int
     email: EmailStr
+    role: str 
     created_at: datetime
 
 # Update schema (partial update)
 class UserUpdate(SQLModel):
     email: Optional[EmailStr] = None
-    password: Optional[str] = Field(default=None, min_length=8)
+    password: Optional[str] = PydanticField(default=None, min_length=8)

@@ -5,7 +5,7 @@ from schemas.user import UserCreate, UserOut
 from crud import user as user_crud
 from models.user import User
 from auth import get_current_user
-
+from dependencies.roles import require_role
 router = APIRouter()
 
 @router.post("/", response_model=UserOut,)
@@ -29,7 +29,8 @@ def get_user(
 @router.delete("/{user_id}", response_model=UserOut)
 def delete_user(
     user_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user : User = Depends(require_role("admin"))
 ):
     user = user_crud.delete_user(db, user_id)
     if not user:
@@ -39,7 +40,7 @@ def delete_user(
 @router.get("/", response_model=list[UserOut])
 def list_users(
     db: Session = Depends(get_db),
-    
+    current_user : User = Depends(require_role("admin"))
 ):
     return user_crud.get_all_users(db)
 

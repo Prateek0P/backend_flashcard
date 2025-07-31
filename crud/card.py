@@ -2,8 +2,9 @@ from sqlmodel import Session, select
 from models.card import Card
 from schemas.card import CardCreate, CardUpdate
 from typing import List,Optional
-from fastapi import Query
+from fastapi import Query,Depends
 from sqlalchemy import or_,func
+from database import get_db
 
 def create_card(db: Session, card: CardCreate) -> Card:
     new_card = Card(**card.dict())
@@ -35,37 +36,23 @@ def update_card(db: Session, card_id: int, card_update: CardUpdate) -> Card | No
     db.refresh(card)
     return card
 
-
-
 def list_cards(
-    deck_id: int,
     db: Session,
-    
+    deck_id: int,
     limit: int = 10,
     offset: int = 0,
-    
     search: Optional[str] = None
 ) -> List[Card]:
+    statement = select(Card).where(Card.deck_id == deck_id)
 
-    # Start with all cards
-    statement = select(Card)
-
-    # Filter by deck if provided
-    if deck_id is not None:
-        statement = statement.where(Card.deck_id == deck_id)
-
-    # Search by keyword if provided
     if search:
         search_term = f"%{search.lower()}%"
         statement = statement.where(
-    or_(
-        func.lower(Card.front).like(search_term),
-        func.lower(Card.back).like(search_term)
-    )
-)
+            or_(
+                func.lower(Card.front).like(search_term),
+                func.lower(Card.back).like(search_term)
+            )
+        )
 
-    # Apply pagination
     statement = statement.offset(offset).limit(limit)
-
     return db.exec(statement).all()
-

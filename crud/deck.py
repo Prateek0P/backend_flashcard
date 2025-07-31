@@ -1,6 +1,8 @@
-from sqlmodel import Session, select
+from sqlmodel import Session, select, func
 from models.deck import Deck
 from schemas.deck import DeckCreate, DeckUpdate
+from typing import Optional
+
 
 def create_deck(db: Session, deck: DeckCreate) -> Deck:
     db_deck = Deck(**deck.dict())
@@ -31,6 +33,10 @@ def update_deck(db: Session, deck_id: int, new_data: DeckUpdate) -> Deck | None:
     db.refresh(deck)
     return deck
 
-def get_all_decks(db: Session, limit:int, offset: int) -> list[Deck]:
+def get_all_decks(db: Session, limit:int, offset: int, 
+    search: Optional[str] = None) -> list[Deck]:
     statement = select(Deck).limit(limit).offset(offset)
+    if search:
+        search_term = f"%{search.lower()}%"
+        statement = statement.where(func.lower(Deck.name).like(search_term))
     return db.exec(statement).all()

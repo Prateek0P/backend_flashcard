@@ -10,11 +10,8 @@ from models.user import User
 from utils.security import verify_password
 from crud.user import get_user_by_email
 
-
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")  # ✅ already correct now
-
 
 SECRET_KEY = "M7Nq1ULeLU7R7PdhxgoJscU2fN_vLdZ5k_9ZUI2d5Y"
 ALGORITHM = "HS256"

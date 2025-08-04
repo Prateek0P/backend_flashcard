@@ -11,4 +11,6 @@ class User(SQLModel, table=True):
     hashed_password: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
     role: str = Field(default = "user")
-    decks: List["Deck"] = Relationship(back_populates="owner")  # use string reference
+    decks: List["Deck"] = Relationship(back_populates="owner", sa_relationship_kwargs={"cascade": "all,delete"})
+    
+    # use string reference

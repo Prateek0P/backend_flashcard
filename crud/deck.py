@@ -2,17 +2,18 @@ from sqlmodel import Session, select, func
 from models.deck import Deck
 from schemas.deck import DeckCreate, DeckUpdate
 from typing import Optional
+from sqlalchemy.orm import joinedload
 
-
-def create_deck(db: Session, deck: DeckCreate) -> Deck:
-    db_deck = Deck(**deck.dict())
+def create_deck(db: Session, deck: DeckCreate, user_id: int) -> Deck:
+    db_deck = Deck(**deck.dict(), owner_id = user_id)
     db.add(db_deck)
     db.commit()
     db.refresh(db_deck)
     return db_deck
 
 def get_deck(db: Session, deck_id: int) -> Deck | None:
-    return db.get(Deck, deck_id)
+    statement = select(Deck).where(Deck.id==deck_id).options(joinedload(Deck.owner))
+    return db.exec(statement).first()
 
 def delete_deck(db: Session, deck_id: int) -> Deck | None:
     deck = db.get(Deck, deck_id)

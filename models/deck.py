@@ -13,4 +13,4 @@ class Deck(SQLModel, table=True):
     owner_id: int = Field(default=None, foreign_key="users.id")
 
     owner: Optional["User"] = Relationship(back_populates="decks")
-    cards: List["Card"] = Relationship(back_populates="deck")
+    cards: List["Card"] = Relationship(back_populates="deck", sa_relationship_kwargs = {"cascade": "all, delete"})

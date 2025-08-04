@@ -26,4 +26,7 @@ app.include_router(card_routes.router, prefix="/cards", tags=["Cards"])
 app.include_router(deck_routes.router, prefix="/decks", tags=["Decks"])
 app.include_router(auth_routes.router, prefix="/auth", tags=["Auth"])
 
-print("FastAPI app is running...")
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the Flashcard API"}
+
